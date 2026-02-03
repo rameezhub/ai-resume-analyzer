@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Resume Analyzer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #0f172a, #020617);
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .container {
+      width: 70%;
+      margin: auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px black;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: #38bdf8;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .progress {
+      background: #334155;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      background: #22c55e;
+      height: 25px;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #020617;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px black;
+    }
+  </style>
+</head>
+
+<body>
+<h1>📄 AI Resume Analyzer</h1>
+
+<div class="container">
+<form method="POST" enctype="multipart/form-data">
+  <label>Upload Resume (PDF)</label>
+  <input type="file" name="pdf" required>
+
+  <label>Paste Job Description</label>
+  <textarea name="jd" rows="5" placeholder="Paste job description here..."></textarea>
+
+  <button>Analyze Resume</button>
+</form>
+
+{% if ats_score %}
+  <h2>ATS Score: {{ ats_score }}%</h2>
+  <div class="progress">
+    <div class="progress-bar" style="width: {{ ats_score }}%">
+      {{ ats_score }}%
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>✅ Matched Skills</h3>
+      <p>{{ matched }}</p>
+    </div>
+
+    <div class="card">
+      <h3>❌ Missing Skills</h3>
+      <p>{{ missing }}</p>
+    </div>
+
+    <div class="card">
+      <h3>🧠 Suggestions</h3>
+      <ul>
+        {% for s in suggestions %}
+        <li>{{ s }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+<script>
+new Chart(document.getElementById("chart"), {
+  type: "doughnut",
+  data: {
+    labels: ["Matched", "Missing"],
+    datasets: [{
+      data: [{{ matched|length }}, {{ missing|length }}],
+      backgroundColor: ["#22c55e", "#ef4444"]
+    }]
+  }
+});
+</script>
+{% endif %}
+</div>
+</body>
+</html>
+
